@@ -157,7 +157,8 @@ class TransformerBlock(nn.Module):
         if mask.shape[2] > 1:
             inp_size = mask.shape[2]
             #print(mask.shape)
-            mask[:, :, :inp_size, :inp_size] = torch.ones_like(mask[:, :, :inp_size, :inp_size]).to('cuda:0', dtype=torch.bool)
+            
+            mask[:, :, :inp_size, :inp_size] = torch.ones_like(mask[:, :, :inp_size, :inp_size]).to(x.device, dtype=torch.bool)
 
         #print(mask.shape)
         h = x + self.attention(self.attention_norm(x), freqs_cis, mask, input_pos)

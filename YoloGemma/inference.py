@@ -313,7 +313,7 @@ def main(
     ### EDIT
 
     model_id = "google/paligemma-3b-mix-224"
-    device = "cuda:0"
+    # device = "cuda:0"## comment out for mac 
     dtype = torch.bfloat16
     
     #url = "https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/cat.jpg?download=true"
@@ -331,6 +331,12 @@ def main(
 
     vision_model = _model.vision_tower
     projector = _model.multi_modal_projector
+
+    ## add codes to login to huggingface
+    import os
+    from huggingface_hub import login
+    hf_token = os.environ.get("HUGGING_FACE_TOKEN")
+    login(token=hf_token)
     processor = AutoProcessor.from_pretrained(model_id)
     
     # Instruct the model to create a caption in Spanish
@@ -341,15 +347,20 @@ def main(
 
     device_sync(device=device) # MKG
     print(f"Time to load model: {time.time() - t0:.02f} seconds")
-
+    ## print the video path and make sure it is a path to a video file
+    print(f"Video path: {vid_path}")
+    assert vid_path.endswith(".mp4"), "Please provide a path to a mp4 video file"
+    
     cap = cv2.VideoCapture(vid_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
+    # print(f"Video FPS: {fps}")##30
     #frame_interval = int(fps // 8)
     frames = []
 
 
     for i in range(int(fps * vid_end)):
         ret, frame = cap.read()
+
 
         # if i > fps * vid_start:
         #     if not ret:
@@ -370,6 +381,7 @@ def main(
     cap.release()
 
     out = cv2.VideoWriter('output_video.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame.shape[1], frame.shape[0]))
+    # out = cv2.VideoWriter('output_video.mp4', cv2.VideoWriter_fourcc(*'H264'), fps, (frame.shape[1], frame.shape[0]))
 
 
     #tokenizer = SentencePieceProcessor(model_file=str(tokenizer_path))
@@ -389,7 +401,9 @@ def main(
             model_forward = torch.compile(model_forward, mode="reduce-overhead", fullgraph=True)
 
         global decode_one_token, prefill
-        decode_one_token = torch.compile(decode_one_token, mode="reduce-overhead", fullgraph=True)
+
+        ## comment out for mac
+        # decode_one_token = torch.compile(decode_one_token, mode="reduce-overhead", fullgraph=True)
 
         # Uncomment to squeeze more perf out of prefill
         if compile_prefill:
@@ -430,7 +444,7 @@ def main(
 
         if i % 2== 0:
             width, height = frame.size 
-            model_inputs = processor(text=prompt, images=frame, return_tensors="pt").to('cuda:0')
+            model_inputs = processor(text=prompt, images=frame, return_tensors="pt").to(device)
             encoded = model_inputs['input_ids'][0]
             prompt_length = encoded.size(0)
 
@@ -629,6 +643,10 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
+
+
+
+# Now you can access the gated repo
 
     main(
         args.prompt, args.vid_path, args.vid_start, args.vid_end, args.interactive, args.max_new_tokens, args.top_k,

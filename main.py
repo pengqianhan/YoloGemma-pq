@@ -30,7 +30,11 @@ if __name__ == '__main__':
 
 
     args = parser.parse_args()
-
+    
+    ## add this for changing device
+    import torch
+    args.device = args.device if args.device == "cuda" and torch.cuda.is_available() else "cpu"
+    
     main(
         args.prompt, args.vid_path, args.vid_start, args.vid_end, args.interactive, args.max_new_tokens, args.top_k,
         args.temperature, args.checkpoint_path, args.compile, args.compile_prefill, args.profile, args.draft_checkpoint_path,
