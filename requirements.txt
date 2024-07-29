@@ -6,4 +6,6 @@ opencv-python
 Pillow
 transformers
 numpy
-
+requests
+huggingface_hub
+transformers

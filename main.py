@@ -34,7 +34,13 @@ if __name__ == '__main__':
     ## add this for changing device
     import torch
     args.device = args.device if args.device == "cuda" and torch.cuda.is_available() else "cpu"
-    
+
+    args.prompt = "Detect the boy"
+    args.vid_path = "./people.mp4"
+    args.vid_start = 1
+    args.vid_end = 8
+    args.max_new_tokens = 10
+
     main(
         args.prompt, args.vid_path, args.vid_start, args.vid_end, args.interactive, args.max_new_tokens, args.top_k,
         args.temperature, args.checkpoint_path, args.compile, args.compile_prefill, args.profile, args.draft_checkpoint_path,

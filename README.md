@@ -59,7 +59,7 @@ YoloGemma provides three main scripts to facilitate various tasks. Below are ins
 
 ### Main Script for Object Detection
 ```bash
-python main.py --prompt "Detect 4 people" --vid_path ./people.mp4 --vid_start 1 --vid_end 12 --max_new_tokens 10
+python main.py --prompt "Detect a girl" --vid_path ./people.mp4 --vid_start 1 --vid_end 4 --max_new_tokens 10
 ```
 
 #### Command Line Arguments
